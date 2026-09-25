@@ -12,18 +12,18 @@ import DualPaneCore
 public enum DisplayEnvironmentAdapter {
     public static func capture(in view: UIView) -> DisplayEnvironment {
         let safe = view.safeAreaLayoutGuide.layoutFrame
-        var regions: [DualPaneCore.ReservedRegion] = []
+        var regions: [ExclusionRegion] = []
         #if canImport(UIKit, _version: 9127.0.85)
         if #available(iOS 27.1, *) {
             regions += view.reservedRegions(kind: .division).filter(\.isActive).map {
-                ReservedRegion(frame: $0.frame, kind: .division)
+                ExclusionRegion(frame: $0.frame, kind: .division)
             }
             regions += view.reservedRegions(kind: .occlusion).filter(\.isActive).map {
-                ReservedRegion(frame: $0.frame, kind: .occlusion)
+                ExclusionRegion(frame: $0.frame, kind: .occlusion)
             }
         }
         #endif
-        return DisplayEnvironment(bounds: view.bounds, safeBounds: safe, reservedRegions: regions)
+        return DisplayEnvironment(bounds: view.bounds, safeBounds: safe, exclusionRegions: regions)
     }
 
     /// A hinge callback requests a fresh geometry query.

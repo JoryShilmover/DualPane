@@ -11,7 +11,7 @@ extension CGRect {
     }
 }
 
-public struct ReservedRegion: Equatable, Sendable {
+public struct ExclusionRegion: Equatable, Sendable {
     public enum Kind: Equatable, Sendable { case division, occlusion }
     public let frame: CGRect
     public let kind: Kind
@@ -25,15 +25,15 @@ public struct ReservedRegion: Equatable, Sendable {
 public struct DisplayEnvironment: Equatable, Sendable {
     public let bounds: CGRect
     public let safeBounds: CGRect
-    public let reservedRegions: [ReservedRegion]
-    public init(bounds: CGRect, safeBounds: CGRect, reservedRegions: [ReservedRegion] = []) {
+    public let exclusionRegions: [ExclusionRegion]
+    public init(bounds: CGRect, safeBounds: CGRect, exclusionRegions: [ExclusionRegion] = []) {
         self.bounds = bounds
         self.safeBounds = safeBounds
-        self.reservedRegions = reservedRegions
+        self.exclusionRegions = exclusionRegions
     }
     public static func == (lhs: Self, rhs: Self) -> Bool {
         lhs.bounds.duoEquals(rhs.bounds) && lhs.safeBounds.duoEquals(rhs.safeBounds)
-            && lhs.reservedRegions == rhs.reservedRegions
+            && lhs.exclusionRegions == rhs.exclusionRegions
     }
 }
 
@@ -96,7 +96,7 @@ public enum ScreenLayoutSolver {
                                   lowerScreen: CGRect(x: 0, y: 0, width: 0, height: 0),
                                   effectiveMode: .stacked, controlRegions: [], isCompact: true)
         }
-        let barriers = environment.reservedRegions.map { $0.frame.standardized.intersection(safe) }
+        let barriers = environment.exclusionRegions.map { $0.frame.standardized.intersection(safe) }
             .filter { !$0.isNull && $0.width > 0 && $0.height > 0 }
         let free = maximalFreeRects(in: safe, avoiding: barriers)
         var candidates: [Candidate] = []

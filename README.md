@@ -32,7 +32,7 @@ import DualPaneCore
 let environment = DisplayEnvironment(
     bounds: CGRect(x: 0, y: 0, width: 900, height: 700),
     safeBounds: CGRect(x: 0, y: 0, width: 900, height: 700),
-    reservedRegions: [ReservedRegion(frame: CGRect(x: 440, y: 0, width: 20, height: 700), kind: .division)]
+    exclusionRegions: [ExclusionRegion(frame: CGRect(x: 440, y: 0, width: 20, height: 700), kind: .division)]
 )
 let solution = ScreenLayoutSolver.solve(environment: environment)
 // solution.upperScreen, solution.lowerScreen, solution.effectiveMode == .split

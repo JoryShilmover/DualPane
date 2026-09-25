@@ -21,7 +21,7 @@ private func expectScreen(_ screen: CGRect, inside safe: CGRect, avoiding barrie
         let safe = rect(12, 42, 366, 760)
         let camera = rect(160, 42, 70, 40)
         let environment = DisplayEnvironment(bounds: rect(0, 0, 390, 844), safeBounds: safe,
-            reservedRegions: [ReservedRegion(frame: camera, kind: .occlusion)])
+            exclusionRegions: [ExclusionRegion(frame: camera, kind: .occlusion)])
         let result = ScreenLayoutSolver.solve(environment: environment)
         expectScreen(result.upperScreen, inside: safe, avoiding: [camera])
         expectScreen(result.lowerScreen, inside: safe, avoiding: [camera])
@@ -38,7 +38,7 @@ private func expectScreen(_ screen: CGRect, inside safe: CGRect, avoiding barrie
         let safe = rect(0, 0, 900, 700)
         let division = rect(440, 0, 20, 700)
         let environment = DisplayEnvironment(bounds: safe, safeBounds: safe,
-            reservedRegions: [ReservedRegion(frame: division, kind: .division)])
+            exclusionRegions: [ExclusionRegion(frame: division, kind: .division)])
         let standard = ScreenLayoutSolver.solve(environment: environment)
         let swapped = ScreenLayoutSolver.solve(environment: environment, swapScreens: true)
         expectScreen(standard.upperScreen, inside: safe, avoiding: [division])
@@ -91,7 +91,7 @@ private func expectScreen(_ screen: CGRect, inside safe: CGRect, avoiding barrie
         let safe = rect(0, 0, 867, 523)
         let division = rect(456, -82, 40, 669)
         let result = ScreenLayoutSolver.solve(environment: DisplayEnvironment(bounds: safe, safeBounds: safe,
-            reservedRegions: [ReservedRegion(frame: division, kind: .division)]))
+            exclusionRegions: [ExclusionRegion(frame: division, kind: .division)]))
         #expect(result.effectiveMode == .split)
         #expect(result.controlRegions.count == 2)
         for cluster in result.controlRegions {
