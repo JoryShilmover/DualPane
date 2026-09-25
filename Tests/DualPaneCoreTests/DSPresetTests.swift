@@ -16,21 +16,21 @@ private func expectScreen(_ screen: CGRect, inside safe: CGRect, avoiding barrie
     for barrier in barriers { #expect(!screen.intersects(barrier), sourceLocation: sourceLocation) }
 }
 
-@Suite struct ScreenLayoutSolverTests {
+@Suite struct DSPresetTests {
     @Test func safeAreaAndCameraOcclusion() {
         let safe = rect(12, 42, 366, 760)
         let camera = rect(160, 42, 70, 40)
         let environment = DisplayEnvironment(bounds: rect(0, 0, 390, 844), safeBounds: safe,
             exclusionRegions: [ExclusionRegion(frame: camera, kind: .occlusion)])
-        let result = ScreenLayoutSolver.solve(environment: environment)
-        expectScreen(result.upperScreen, inside: safe, avoiding: [camera])
-        expectScreen(result.lowerScreen, inside: safe, avoiding: [camera])
-        #expect(!result.upperScreen.intersects(result.lowerScreen))
-        for controls in result.controlRegions {
+        let result = DualPaneSolver.solve(environment: environment, configuration: .ds)
+        expectScreen(result.primaryPane, inside: safe, avoiding: [camera])
+        expectScreen(result.secondaryPane, inside: safe, avoiding: [camera])
+        #expect(!result.primaryPane.intersects(result.secondaryPane))
+        for controls in result.accessoryRegions {
             #expect(safe.contains(controls))
             #expect(!controls.intersects(camera))
-            #expect(!controls.intersects(result.upperScreen))
-            #expect(!controls.intersects(result.lowerScreen))
+            #expect(!controls.intersects(result.primaryPane))
+            #expect(!controls.intersects(result.secondaryPane))
         }
     }
 
@@ -39,23 +39,23 @@ private func expectScreen(_ screen: CGRect, inside safe: CGRect, avoiding barrie
         let division = rect(440, 0, 20, 700)
         let environment = DisplayEnvironment(bounds: safe, safeBounds: safe,
             exclusionRegions: [ExclusionRegion(frame: division, kind: .division)])
-        let standard = ScreenLayoutSolver.solve(environment: environment)
-        let swapped = ScreenLayoutSolver.solve(environment: environment, swapScreens: true)
-        expectScreen(standard.upperScreen, inside: safe, avoiding: [division])
-        expectScreen(standard.lowerScreen, inside: safe, avoiding: [division])
-        #expect(standard.effectiveMode == .split)
-        #expect(standard.upperScreen.duoEquals(swapped.lowerScreen))
-        #expect(standard.lowerScreen.duoEquals(swapped.upperScreen))
+        let standard = DualPaneSolver.solve(environment: environment, configuration: .ds)
+        let swapped = DualPaneSolver.solve(environment: environment, configuration: .ds, swapPanes: true)
+        expectScreen(standard.primaryPane, inside: safe, avoiding: [division])
+        expectScreen(standard.secondaryPane, inside: safe, avoiding: [division])
+        #expect(standard.arrangement == .split)
+        #expect(standard.primaryPane == swapped.secondaryPane)
+        #expect(standard.secondaryPane == swapped.primaryPane)
     }
 
     @Test func manualModesAndCompactFallback() {
         let safe = rect(0, 0, 320, 470)
         let environment = DisplayEnvironment(bounds: safe, safeBounds: safe)
-        let stacked = ScreenLayoutSolver.solve(environment: environment, preference: .stacked)
-        let side = ScreenLayoutSolver.solve(environment: environment, preference: .sideBySide)
-        #expect(stacked.effectiveMode == .stacked)
-        #expect(side.effectiveMode == .sideBySide)
-        for screen in [stacked.upperScreen, stacked.lowerScreen, side.upperScreen, side.lowerScreen] {
+        let stacked = DualPaneSolver.solve(environment: environment, configuration: .ds, preference: .stacked)
+        let side = DualPaneSolver.solve(environment: environment, configuration: .ds, preference: .sideBySide)
+        #expect(stacked.arrangement == .stacked)
+        #expect(side.arrangement == .sideBySide)
+        for screen in [stacked.primaryPane, stacked.secondaryPane, side.primaryPane, side.secondaryPane] {
             expectScreen(screen, inside: safe, avoiding: [])
         }
     }
@@ -70,19 +70,20 @@ private func expectScreen(_ screen: CGRect, inside safe: CGRect, avoiding barrie
                       ("iPhone 15 Pro Max portrait", CGSize(width: 430, height: 747)),
                       ("iPhone landscape (estimate)", CGSize(width: 814, height: 350))])
     func observedGeometriesGetThumbClusters(name: String, size: CGSize) throws {
-        let min = ScreenLayoutSolver.clusterMinimum
+        let min = DualPaneConfiguration.ds.accessories!.minimumSize
         let safe = rect(0, 0, size.width, size.height)
-        let result = ScreenLayoutSolver.solve(environment: DisplayEnvironment(bounds: safe, safeBounds: safe))
-        try #require(result.controlRegions.count == 2, "\(name)")
-        #expect(!result.controlsOverlapScreens, "\(name)")
+        let result = DualPaneSolver.solve(environment: DisplayEnvironment(bounds: safe, safeBounds: safe),
+                                          configuration: .ds)
+        try #require(result.accessoryRegions.count == 2, "\(name)")
+        #expect(!result.accessoriesOverlapPanes, "\(name)")
         #expect(!result.isCompact, "\(name)")
-        let (left, right) = (result.controlRegions[0], result.controlRegions[1])
+        let (left, right) = (result.accessoryRegions[0], result.accessoryRegions[1])
         #expect(left.midX < right.midX, "\(name): D-pad cluster must be on the left")
-        for cluster in result.controlRegions {
+        for cluster in result.accessoryRegions {
             #expect(cluster.width >= min.width, "\(name)")
             #expect(cluster.height >= min.height, "\(name)")
             #expect(safe.contains(cluster), "\(name)")
-            #expect(!(cluster.intersects(result.upperScreen) || cluster.intersects(result.lowerScreen)), "\(name)")
+            #expect(!(cluster.intersects(result.primaryPane) || cluster.intersects(result.secondaryPane)), "\(name)")
         }
         #expect(!left.intersects(right), "\(name)")
     }
@@ -90,13 +91,13 @@ private func expectScreen(_ screen: CGRect, inside safe: CGRect, avoiding barrie
     @Test func halfFoldPutsControlsWithLowerScreenClearOfHinge() {
         let safe = rect(0, 0, 867, 523)
         let division = rect(456, -82, 40, 669)
-        let result = ScreenLayoutSolver.solve(environment: DisplayEnvironment(bounds: safe, safeBounds: safe,
-            exclusionRegions: [ExclusionRegion(frame: division, kind: .division)]))
-        #expect(result.effectiveMode == .split)
-        #expect(result.controlRegions.count == 2)
-        for cluster in result.controlRegions {
+        let result = DualPaneSolver.solve(environment: DisplayEnvironment(bounds: safe, safeBounds: safe,
+            exclusionRegions: [ExclusionRegion(frame: division, kind: .division)]), configuration: .ds)
+        #expect(result.arrangement == .split)
+        #expect(result.accessoryRegions.count == 2)
+        for cluster in result.accessoryRegions {
             #expect(!cluster.intersects(division))
-            #expect(!(cluster.intersects(result.lowerScreen) || cluster.intersects(result.upperScreen)))
+            #expect(!(cluster.intersects(result.secondaryPane) || cluster.intersects(result.primaryPane)))
         }
     }
 }

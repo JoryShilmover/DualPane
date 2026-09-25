@@ -3,16 +3,19 @@
 import SwiftUI
 import DualPaneCore
 
-/// Places exactly two subviews in the panes chosen by ``ScreenLayoutSolver``.
-/// The first subview goes in the upper (or leading) pane, the second in the lower (or trailing) pane.
-/// Pass exclusion regions (in this layout's coordinate space) to keep panes clear of a hinge or cutout.
+/// Places exactly two subviews in the panes chosen by ``DualPaneSolver``: the first in the primary pane,
+/// the second in the secondary pane. Pass exclusion regions (in this layout's coordinate space) to keep
+/// panes clear of a hinge or cutout.
 public struct DualPaneLayout: Layout {
-    public var preference: ScreenLayoutPreference
+    public var configuration: DualPaneConfiguration
+    public var preference: ArrangementPreference
     public var swapPanes: Bool
     public var exclusionRegions: [ExclusionRegion]
 
-    public init(preference: ScreenLayoutPreference = .automatic, swapPanes: Bool = false,
+    public init(configuration: DualPaneConfiguration = DualPaneConfiguration(),
+                preference: ArrangementPreference = .automatic, swapPanes: Bool = false,
                 exclusionRegions: [ExclusionRegion] = []) {
+        self.configuration = configuration
         self.preference = preference
         self.swapPanes = swapPanes
         self.exclusionRegions = exclusionRegions
@@ -24,10 +27,10 @@ public struct DualPaneLayout: Layout {
 
     public func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
         let local = CGRect(origin: .zero, size: bounds.size)
-        let solution = ScreenLayoutSolver.solve(
+        let solution = DualPaneSolver.solve(
             environment: DisplayEnvironment(bounds: local, safeBounds: local, exclusionRegions: exclusionRegions),
-            preference: preference, swapScreens: swapPanes)
-        for (subview, frame) in zip(subviews, [solution.upperScreen, solution.lowerScreen]) {
+            configuration: configuration, preference: preference, swapPanes: swapPanes)
+        for (subview, frame) in zip(subviews, [solution.primaryPane, solution.secondaryPane]) {
             subview.place(at: CGPoint(x: bounds.minX + frame.minX, y: bounds.minY + frame.minY),
                           proposal: ProposedViewSize(frame.size))
         }

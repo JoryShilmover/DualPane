@@ -47,19 +47,20 @@ import DualPaneCore
         let legacy = Legacy.DisplayEnvironment(bounds: bounds, safeBounds: safe, exclusionRegions: raw.map {
             Legacy.ExclusionRegion(frame: $0.0, kind: $0.1 ? .division : .occlusion)
         })
-        let preferences: [(ScreenLayoutPreference, Legacy.ScreenLayoutPreference)] =
+        let preferences: [(ArrangementPreference, Legacy.ScreenLayoutPreference)] =
             [(.automatic, .automatic), (.stacked, .stacked), (.sideBySide, .sideBySide)]
         for (preference, legacyPreference) in preferences {
             for swap in [false, true] {
-                let new = ScreenLayoutSolver.solve(environment: current, preference: preference, swapScreens: swap)
+                let new = DualPaneSolver.solve(environment: current, configuration: .ds,
+                                               preference: preference, swapPanes: swap)
                 let old = Legacy.ScreenLayoutSolver.solve(environment: legacy, preference: legacyPreference, swapScreens: swap)
                 let context = "\(scenario) \(preference) swap=\(swap)"
-                #expect(new.upperScreen == old.upperScreen, "\(context)")
-                #expect(new.lowerScreen == old.lowerScreen, "\(context)")
-                #expect("\(new.effectiveMode)" == "\(old.effectiveMode)", "\(context)")
-                #expect(new.controlRegions == old.controlRegions, "\(context)")
+                #expect(new.primaryPane == old.upperScreen, "\(context)")
+                #expect(new.secondaryPane == old.lowerScreen, "\(context)")
+                #expect("\(new.arrangement)" == "\(old.effectiveMode)", "\(context)")
+                #expect(new.accessoryRegions == old.controlRegions, "\(context)")
                 #expect(new.isCompact == old.isCompact, "\(context)")
-                #expect(new.controlsOverlapScreens == old.controlsOverlapScreens, "\(context)")
+                #expect(new.accessoriesOverlapPanes == old.controlsOverlapScreens, "\(context)")
             }
         }
     }
