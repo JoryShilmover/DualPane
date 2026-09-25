@@ -1,0 +1,16 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test (macOS)
+        run: swift test
+      - name: Build (iOS Simulator)
+        run: xcodebuild build -scheme DualPane-Package -destination 'generic/platform=iOS Simulator' -quiet
