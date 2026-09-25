@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2026 Jory Shilmover
+#if canImport(CoreGraphics)
 import CoreGraphics
 
 // Frozen copy of the solver as extracted from Duo DS (ScreenLayoutSolver at 8acef0b). The DS preset of
@@ -260,3 +261,4 @@ enum Legacy {
         }
     }
 }
+#endif

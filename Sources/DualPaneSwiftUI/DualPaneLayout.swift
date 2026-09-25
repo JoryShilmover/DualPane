@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2026 Jory Shilmover
+#if canImport(SwiftUI)
 import SwiftUI
 import DualPaneCore
 
@@ -36,3 +37,4 @@ public struct DualPaneLayout: Layout {
         }
     }
 }
+#endif

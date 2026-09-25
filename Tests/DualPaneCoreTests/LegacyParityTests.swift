@@ -1,5 +1,8 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2026 Jory Shilmover
+// The frozen solver relies on CoreGraphics rectangle semantics, so it is only a valid reference on Apple
+// platforms. There, this suite also checks that DualPaneCore's own geometry helpers match CoreGraphics.
+#if canImport(CoreGraphics)
 import CoreGraphics
 import Testing
 import DualPaneCore
@@ -65,3 +68,4 @@ import DualPaneCore
         }
     }
 }
+#endif
