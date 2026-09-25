@@ -31,7 +31,7 @@ struct LiveDisplayView: View {
                 }
             }
             .ignoresSafeArea()
-            .animation(.snappy, value: environment)
+            .animation(.snappy, value: environment.map { model.solve($0).arrangement })
 
             Button("Done") { dismiss() }
                 .buttonStyle(.borderedProminent)

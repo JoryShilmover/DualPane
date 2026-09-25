@@ -11,7 +11,7 @@ struct SimulatedDisplayView: View {
     var body: some View {
         GeometryReader { proxy in
             let available = CGSize(width: proxy.size.width, height: max(1, proxy.size.height - 56))
-            let size = model.displayPreset.size ?? available
+            let size = model.sizeOverride ?? model.displayPreset.size ?? available
             let scale = min(1, available.width / size.width, available.height / size.height)
             let solution = model.solve(model.environment(for: size))
             VStack(spacing: 16) {
@@ -37,12 +37,15 @@ private struct DisplayCanvas: View {
         ZStack(alignment: .topLeading) {
             Rectangle().fill(.background.secondary)
 
-            // The panes' content is placed by the SwiftUI layout; the overlays below come from the solver.
-            // They line up because DualPaneLayout runs the same solve.
+            // Pane content is placed by the SwiftUI layout, and the size labels come from the solver.
+            // They agree because DualPaneLayout runs the same solve. Outlines ride on the content so the
+            // two move together when a layout change animates.
             DualPaneLayout(configuration: model.configuration, preference: model.preference,
                            swapPanes: model.swapPanes, exclusionRegions: model.exclusionRegions(in: size)) {
                 SamplePane(role: .primary, preset: model.configurationPreset)
+                    .overlay { if model.showsOutlines { PaneOutline.primary(solution) } }
                 SamplePane(role: .secondary, preset: model.configurationPreset)
+                    .overlay { if model.showsOutlines { PaneOutline.secondary(solution) } }
             }
 
             ForEach(Array(solution.accessoryRegions.enumerated()), id: \.offset) { index, region in
@@ -53,13 +56,13 @@ private struct DisplayCanvas: View {
             if model.showsHinge { hinge }
             if model.showsCamera { camera }
 
-            if model.showsOutlines { SolutionOverlay(solution: solution) }
         }
         .frame(width: size.width, height: size.height)
         .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
         .overlay(RoundedRectangle(cornerRadius: 28, style: .continuous).strokeBorder(.separator, lineWidth: 2))
         .coordinateSpace(.named(Self.space))
-        .animation(.snappy, value: solution)
+        // Animate only arrangement flips; continuous changes (dragging, resizing) track the solver exactly.
+        .animation(model.animatesArrangementChanges ? .snappy : nil, value: solution.arrangement)
     }
 
     private var hinge: some View {

@@ -200,7 +200,7 @@ public enum DualPaneSolver {
         let first = fit(firstCell, context.firstSizing)
         var second = fit(secondArea, context.secondSizing)
         if case .band = style { second = second.offsetBy(dx: 0, dy: secondArea.maxY - second.maxY) }
-        guard first.width > 0, second.width > 0, !first.intersects(second) else { return nil }
+        guard first.width > 0, second.width > 0, !first.overlaps(second) else { return nil }
         let separated = horizontal ? first.maxX <= second.minX : first.maxY <= second.minY
         guard separated else { return nil }
         let smallest = min(measure(first, context.configuration), measure(second, context.configuration))
@@ -222,12 +222,12 @@ public enum DualPaneSolver {
                         let rect = CGRect(x: xs[left], y: ys[top], width: xs[right] - xs[left],
                                           height: ys[bottom] - ys[top])
                         guard rect.width > 0, rect.height > 0,
-                              !barriers.contains(where: { $0.intersects(rect) }) else { continue }
+                              !barriers.contains(where: { $0.overlaps(rect) }) else { continue }
                         result.append(rect)
                     }
                 }
             }
         }
-        return result.filter { rect in !result.contains { other in other != rect && other.contains(rect) } }
+        return result.filter { rect in !result.contains { other in other != rect && other.encloses(rect) } }
     }
 }

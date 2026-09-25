@@ -18,3 +18,11 @@ jobs:
         run: xcodebuild build -project Examples/DualPaneDemo/DualPaneDemo.xcodeproj -scheme DualPaneDemo -destination 'platform=macOS' CODE_SIGNING_ALLOWED=NO -quiet
       - name: Build demo app (iOS Simulator)
         run: xcodebuild build -project Examples/DualPaneDemo/DualPaneDemo.xcodeproj -scheme DualPaneDemo -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO -quiet
+
+  linux:
+    runs-on: ubuntu-latest
+    container: swift:6.1
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test (Linux)
+        run: swift test

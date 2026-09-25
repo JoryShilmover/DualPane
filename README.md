@@ -1,9 +1,35 @@
 # DualPane
 
+[![Swift versions](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2FJoryShilmover%2FDualPane%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/JoryShilmover/DualPane)
+[![Platforms](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2FJoryShilmover%2FDualPane%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/JoryShilmover/DualPane)
+[![CI](https://github.com/JoryShilmover/DualPane/actions/workflows/ci.yml/badge.svg?branch=develop)](https://github.com/JoryShilmover/DualPane/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/JoryShilmover/DualPane)](https://github.com/JoryShilmover/DualPane/releases)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+
 Lay out two panes on foldable, dual-screen and ordinary displays. DualPane finds the best stacked,
 side-by-side or split arrangement around hinges, camera cutouts and safe areas.
 
-Extracted from the screen-layout solver in the Duo DS emulator.
+<p align="center">
+  <img src=".github/media/fold.gif" width="400" alt="Two 4:3 DS screens and thumb controls re-laid out as a horizontal fold moves">
+</p>
+
+## Why DualPane?
+
+- **Foldables without special cases.** Hand the solver the hinge and any camera cutout, and it keeps both
+  panes clear of them, splitting across the fold when each side has room. On iOS 27.1, `DualPaneUIKit`
+  reads the fold regions for you.
+- **One layout for every shape.** The same call handles portrait, landscape, Split View and resizable
+  windows, choosing stacked, side by side or split based on which keeps the smaller pane largest.
+- **Fixed-aspect content.** Panes can keep an aspect ratio, such as 4:3 game screens or 16:9 video, and the
+  solver can reserve room for on-screen controls beside them.
+- **Plain geometry you can test.** `DualPaneCore` takes rectangles and returns rectangles, with no UI
+  framework, so layouts can be unit tested. It runs on Apple platforms and Linux.
+
+If you only need to switch between an `HStack` and a `VStack` by width, SwiftUI's `ViewThatFits` or a size
+class check is simpler. DualPane is for when the display itself has obstacles or the panes have shapes to
+keep.
+
+DualPane was extracted from the screen-layout solver in the Duo DS emulator.
 
 > **Status:** early (0.x). Expect breaking changes before 1.0.
 
@@ -11,7 +37,7 @@ Extracted from the screen-layout solver in the Duo DS emulator.
 
 | Product | Platforms | What it does |
 |---|---|---|
-| `DualPaneCore` | all | Platform-independent solver: `DisplayEnvironment` in, `LayoutSolution` out. |
+| `DualPaneCore` | Apple platforms, Linux | Platform-independent solver: `DisplayEnvironment` in, `LayoutSolution` out. |
 | `DualPaneUIKit` | iOS | Captures a `DisplayEnvironment` from a `UIView`, including iOS 27.1 fold regions and hinge changes. |
 | `DualPaneSwiftUI` | iOS, macOS, tvOS, visionOS | `DualPaneLayout`, a SwiftUI `Layout` that places two views. |
 
@@ -19,7 +45,7 @@ Extracted from the screen-layout solver in the Duo DS emulator.
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/JoryShilmover/DualPane.git", from: "0.1.0"),
+    .package(url: "https://github.com/JoryShilmover/DualPane.git", from: "0.1.1"),
 ]
 ```
 
@@ -64,6 +90,14 @@ thumb-control regions.
 Fold regions come from the iOS 27.1 SDK. If you build with an older SDK, `DualPaneUIKit` reports
 the safe area only.
 
+## In action
+
+| A hinge moves: panes stay split across it | The display narrows: side by side becomes stacked |
+|---|---|
+| <img src=".github/media/hinge.gif" alt="Two panes split across a vertical hinge as it moves"> | <img src=".github/media/resize.gif" alt="Two panes switch from side by side to stacked as the display narrows"> |
+
+The GIF at the top uses the `.ds` preset. These two use the default configuration.
+
 ## Demo app
 
 `Examples/DualPaneDemo` is a small iOS and macOS app for trying the solver. Open
@@ -76,6 +110,9 @@ the safe area only.
 
 To run it on a device, choose your team under Signing & Capabilities. Launch arguments set the
 starting state, for example `-display duoInnerLandscape -configuration ds -hinge vertical -camera YES`.
+
+The GIFs in this README are the demo's scripted tours (`-tour fold`, `-tour hinge`, `-tour resize`).
+`Examples/DualPaneDemo/record-gifs.sh` records them on an iPad simulator and needs `ffmpeg`.
 
 ## License
 

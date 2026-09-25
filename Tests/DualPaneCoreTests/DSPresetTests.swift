@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2026 Jory Shilmover
+import Foundation
+#if canImport(CoreGraphics)
 import CoreGraphics
+#endif
 import Testing
 import DualPaneCore
 
@@ -11,9 +14,9 @@ private func rect(_ x: CGFloat, _ y: CGFloat, _ w: CGFloat, _ h: CGFloat) -> CGR
 private func expectScreen(_ screen: CGRect, inside safe: CGRect, avoiding barriers: [CGRect],
                           sourceLocation: SourceLocation = #_sourceLocation) {
     #expect(screen.width > 0, sourceLocation: sourceLocation)
-    #expect(safe.contains(screen), sourceLocation: sourceLocation)
+    #expect(safe.surrounds(screen), sourceLocation: sourceLocation)
     #expect(abs(screen.width / screen.height - 4.0 / 3.0) < 0.001, sourceLocation: sourceLocation)
-    for barrier in barriers { #expect(!screen.intersects(barrier), sourceLocation: sourceLocation) }
+    for barrier in barriers { #expect(!screen.sharesArea(with: barrier), sourceLocation: sourceLocation) }
 }
 
 @Suite struct DSPresetTests {
@@ -25,12 +28,12 @@ private func expectScreen(_ screen: CGRect, inside safe: CGRect, avoiding barrie
         let result = DualPaneSolver.solve(environment: environment, configuration: .ds)
         expectScreen(result.primaryPane, inside: safe, avoiding: [camera])
         expectScreen(result.secondaryPane, inside: safe, avoiding: [camera])
-        #expect(!result.primaryPane.intersects(result.secondaryPane))
+        #expect(!result.primaryPane.sharesArea(with: result.secondaryPane))
         for controls in result.accessoryRegions {
-            #expect(safe.contains(controls))
-            #expect(!controls.intersects(camera))
-            #expect(!controls.intersects(result.primaryPane))
-            #expect(!controls.intersects(result.secondaryPane))
+            #expect(safe.surrounds(controls))
+            #expect(!controls.sharesArea(with: camera))
+            #expect(!controls.sharesArea(with: result.primaryPane))
+            #expect(!controls.sharesArea(with: result.secondaryPane))
         }
     }
 
@@ -82,10 +85,11 @@ private func expectScreen(_ screen: CGRect, inside safe: CGRect, avoiding barrie
         for cluster in result.accessoryRegions {
             #expect(cluster.width >= min.width, "\(name)")
             #expect(cluster.height >= min.height, "\(name)")
-            #expect(safe.contains(cluster), "\(name)")
-            #expect(!(cluster.intersects(result.primaryPane) || cluster.intersects(result.secondaryPane)), "\(name)")
+            #expect(safe.surrounds(cluster), "\(name)")
+            #expect(!cluster.sharesArea(with: result.primaryPane), "\(name)")
+            #expect(!cluster.sharesArea(with: result.secondaryPane), "\(name)")
         }
-        #expect(!left.intersects(right), "\(name)")
+        #expect(!left.sharesArea(with: right), "\(name)")
     }
 
     @Test func halfFoldPutsControlsWithLowerScreenClearOfHinge() {
@@ -96,8 +100,8 @@ private func expectScreen(_ screen: CGRect, inside safe: CGRect, avoiding barrie
         #expect(result.arrangement == .split)
         #expect(result.accessoryRegions.count == 2)
         for cluster in result.accessoryRegions {
-            #expect(!cluster.intersects(division))
-            #expect(!(cluster.intersects(result.secondaryPane) || cluster.intersects(result.primaryPane)))
+            #expect(!cluster.sharesArea(with: division))
+            #expect(!(cluster.sharesArea(with: result.secondaryPane) || cluster.sharesArea(with: result.primaryPane)))
         }
     }
 }

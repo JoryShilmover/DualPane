@@ -63,23 +63,17 @@ struct AccessoryMock: View {
     }
 }
 
-/// Outlines and size labels for the solver's panes.
-struct SolutionOverlay: View {
-    let solution: LayoutSolution
+/// Outline and size label for one pane.
+struct PaneOutline: View {
+    let label: String
+    let size: CGSize
+    let color: Color
 
     var body: some View {
-        ZStack(alignment: .topLeading) {
-            outline(solution.primaryPane, label: "Primary", color: .blue)
-            outline(solution.secondaryPane, label: "Secondary", color: .purple)
-        }
-        .allowsHitTesting(false)
-    }
-
-    private func outline(_ rect: CGRect, label: String, color: Color) -> some View {
         RoundedRectangle(cornerRadius: 12, style: .continuous)
             .strokeBorder(color, lineWidth: 2)
             .overlay(alignment: .topLeading) {
-                Text("\(label) \(rect.size.pointsDescription)")
+                Text("\(label) \(size.pointsDescription)")
                     .font(.caption2.weight(.semibold).monospacedDigit())
                     .padding(.horizontal, 6)
                     .padding(.vertical, 2)
@@ -87,7 +81,27 @@ struct SolutionOverlay: View {
                     .foregroundStyle(.white)
                     .padding(6)
             }
-            .placed(in: rect)
+            .allowsHitTesting(false)
+    }
+
+    static func primary(_ solution: LayoutSolution) -> PaneOutline {
+        PaneOutline(label: "Primary", size: solution.primaryPane.size, color: .blue)
+    }
+
+    static func secondary(_ solution: LayoutSolution) -> PaneOutline {
+        PaneOutline(label: "Secondary", size: solution.secondaryPane.size, color: .purple)
+    }
+}
+
+/// Outlines placed straight from a solution, for views that position panes by hand.
+struct SolutionOverlay: View {
+    let solution: LayoutSolution
+
+    var body: some View {
+        ZStack(alignment: .topLeading) {
+            PaneOutline.primary(solution).placed(in: solution.primaryPane)
+            PaneOutline.secondary(solution).placed(in: solution.secondaryPane)
+        }
     }
 }
 
