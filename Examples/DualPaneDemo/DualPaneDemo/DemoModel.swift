@@ -95,8 +95,16 @@ final class DemoModel {
 
     var showsOutlines = true
 
+    /// Animate changes of arrangement. Tours turn this off: they flip layouts often, and cuts read
+    /// better than overlapping transitions in a GIF.
+    var animatesArrangementChanges = true
+    /// Overrides the display preset, for tours that animate the display size.
+    var sizeOverride: CGSize?
+    /// A scripted animation to run instead of the interactive UI (see ``DemoTour``).
+    var tour: DemoTour?
+
     /// Starting state from launch arguments, for scripted screenshots, for example
-    /// `-display duoInnerLandscape -configuration ds -hinge vertical -camera YES`.
+    /// `-display duoInnerLandscape -configuration ds -hinge vertical -camera YES`, or `-tour fold`.
     func applyLaunchArguments(_ defaults: UserDefaults = .standard) {
         func match<T: CaseIterable>(_ key: String, _: T.Type) -> T? {
             guard let name = defaults.string(forKey: key) else { return nil }
@@ -109,6 +117,7 @@ final class DemoModel {
             hingeOrientation = orientation
         }
         if defaults.bool(forKey: "camera") { showsCamera = true }
+        if let tour = match("tour", DemoTour.self) { self.tour = tour }
     }
 
     func hingeFrame(in size: CGSize) -> CGRect {

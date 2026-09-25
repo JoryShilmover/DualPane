@@ -5,6 +5,10 @@ side-by-side or split arrangement around hinges, camera cutouts and safe areas.
 
 Extracted from the screen-layout solver in the Duo DS emulator.
 
+<p align="center">
+  <img src=".github/media/fold.gif" width="400" alt="Two 4:3 DS screens and thumb controls re-laid out as a horizontal fold moves">
+</p>
+
 > **Status:** early (0.x). Expect breaking changes before 1.0.
 
 ## Modules
@@ -64,6 +68,14 @@ thumb-control regions.
 Fold regions come from the iOS 27.1 SDK. If you build with an older SDK, `DualPaneUIKit` reports
 the safe area only.
 
+## In action
+
+| A hinge moves: panes stay split across it | The display narrows: side by side becomes stacked |
+|---|---|
+| <img src=".github/media/hinge.gif" alt="Two panes split across a vertical hinge as it moves"> | <img src=".github/media/resize.gif" alt="Two panes switch from side by side to stacked as the display narrows"> |
+
+The GIF at the top uses the `.ds` preset. These two use the default configuration.
+
 ## Demo app
 
 `Examples/DualPaneDemo` is a small iOS and macOS app for trying the solver. Open
@@ -76,6 +88,9 @@ the safe area only.
 
 To run it on a device, choose your team under Signing & Capabilities. Launch arguments set the
 starting state, for example `-display duoInnerLandscape -configuration ds -hinge vertical -camera YES`.
+
+The GIFs in this README are the demo's scripted tours (`-tour fold`, `-tour hinge`, `-tour resize`).
+`Examples/DualPaneDemo/record-gifs.sh` records them on an iPad simulator and needs `ffmpeg`.
 
 ## License
 

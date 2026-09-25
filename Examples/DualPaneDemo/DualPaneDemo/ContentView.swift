@@ -21,6 +21,14 @@ struct ContentView: View {
     }
 
     var body: some View {
+        if let tour = model.tour {
+            TourStage(model: model, tour: tour)
+        } else {
+            interactive
+        }
+    }
+
+    private var interactive: some View {
         NavigationStack {
             GeometryReader { proxy in
                 if usesSidePanel {
