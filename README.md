@@ -64,6 +64,19 @@ thumb-control regions.
 Fold regions come from the iOS 27.1 SDK. If you build with an older SDK, `DualPaneUIKit` reports
 the safe area only.
 
+## Demo app
+
+`Examples/DualPaneDemo` is a small iOS and macOS app for trying the solver. Open
+`Examples/DualPaneDemo/DualPaneDemo.xcodeproj` and run the `DualPaneDemo` scheme.
+
+- Pick a display size (Duo, iPhone, iPad) or use Freeform and resize the window.
+- Add a hinge or camera housing and drag it around the display.
+- Switch between plain panes and the DS preset, and adjust sizing, gutter and legibility.
+- On iOS, **Live** lays out the device's real display, including fold regions on iOS 27.1.
+
+To run it on a device, choose your team under Signing & Capabilities. Launch arguments set the
+starting state, for example `-display duoInnerLandscape -configuration ds -hinge vertical -camera YES`.
+
 ## License
 
 MIT. See [LICENSE](LICENSE).
