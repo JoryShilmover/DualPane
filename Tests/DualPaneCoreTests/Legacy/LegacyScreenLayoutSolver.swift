@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2026 Jory Shilmover
+import Foundation
+#if canImport(CoreGraphics)
 import CoreGraphics
+#endif
 
 // Frozen copy of the solver as extracted from Duo DS (ScreenLayoutSolver at 8acef0b). The DS preset of
 // the current solver must reproduce these results exactly. Do not edit.

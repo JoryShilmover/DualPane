@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2026 Jory Shilmover
+import Foundation
+#if canImport(CoreGraphics)
 import CoreGraphics
+#endif
 import Testing
 import DualPaneCore
 
