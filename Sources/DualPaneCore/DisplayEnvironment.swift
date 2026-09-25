@@ -7,7 +7,7 @@ import CoreGraphics
 
 /// Part of the display that panes must stay clear of.
 public struct ExclusionRegion: Equatable, Sendable {
-    public enum Kind: Equatable, Sendable {
+    public enum Kind: Hashable, CaseIterable, Sendable {
         /// A physical or logical split, such as a hinge. May leave two separate usable areas.
         case division
         /// Something covering the display, such as a camera housing.

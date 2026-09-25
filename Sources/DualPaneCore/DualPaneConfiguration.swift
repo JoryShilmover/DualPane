@@ -6,7 +6,7 @@ import CoreGraphics
 #endif
 
 /// How a pane fills the slot the solver gives it.
-public enum PaneSizing: Equatable, Sendable {
+public enum PaneSizing: Hashable, Sendable {
     /// Take the whole slot.
     case fill
     /// The largest rectangle of this width-to-height ratio, centred in the slot.
@@ -14,14 +14,14 @@ public enum PaneSizing: Equatable, Sendable {
 }
 
 /// Which dimension counts as a pane's size when layouts are compared.
-public enum PaneMeasure: Equatable, Sendable {
+public enum PaneMeasure: Hashable, CaseIterable, Sendable {
     case width
     /// The smaller of width and height, which suits panes that fill their slot.
     case shortSide
 }
 
 /// Where accessory regions (for example on-screen controls) go relative to the panes.
-public enum AccessoryStyle: Equatable, Sendable {
+public enum AccessoryStyle: Hashable, Sendable {
     /// A strip of this height below the panes, with one region at each end.
     case band(height: CGFloat)
     /// A column of this width on each side of the panes, level with the secondary pane.
