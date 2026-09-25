@@ -5,9 +5,9 @@ import Foundation
 import CoreGraphics
 #endif
 
-public enum ArrangementPreference: Equatable, Sendable { case automatic, stacked, sideBySide }
+public enum ArrangementPreference: Hashable, CaseIterable, Sendable { case automatic, stacked, sideBySide }
 
-public enum PaneArrangement: Equatable, Sendable {
+public enum PaneArrangement: Hashable, CaseIterable, Sendable {
     /// One pane above the other.
     case stacked
     /// Panes next to each other.

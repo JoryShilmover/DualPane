@@ -14,3 +14,7 @@ jobs:
         run: swift test
       - name: Build (iOS Simulator)
         run: xcodebuild build -scheme DualPane-Package -destination 'generic/platform=iOS Simulator' -quiet
+      - name: Build demo app (macOS)
+        run: xcodebuild build -project Examples/DualPaneDemo/DualPaneDemo.xcodeproj -scheme DualPaneDemo -destination 'platform=macOS' CODE_SIGNING_ALLOWED=NO -quiet
+      - name: Build demo app (iOS Simulator)
+        run: xcodebuild build -project Examples/DualPaneDemo/DualPaneDemo.xcodeproj -scheme DualPaneDemo -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO -quiet
