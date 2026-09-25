@@ -6,7 +6,12 @@ Solve two-pane layouts around hinges, folds, cutouts and safe areas.
 
 `DualPaneCore` is platform-independent geometry. Describe the display with a ``DisplayEnvironment``
 (bounds, safe area and any ``ExclusionRegion``s such as a hinge or camera), then call
-``ScreenLayoutSolver/solve(environment:preference:swapScreens:)`` to get a ``LayoutSolution``.
+``DualPaneSolver/solve(environment:configuration:preference:swapPanes:)`` to get a ``LayoutSolution``.
+
+The solver considers stacked, side-by-side and split arrangements in every free area of the display
+and keeps the one whose smaller pane is largest. A ``DualPaneConfiguration`` controls how panes are
+sized, what counts as legible, and whether to reserve two accessory regions, such as on-screen
+controls, next to the secondary pane.
 
 ## Topics
 
@@ -15,9 +20,17 @@ Solve two-pane layouts around hinges, folds, cutouts and safe areas.
 - ``DisplayEnvironment``
 - ``ExclusionRegion``
 
+### Configuring
+
+- ``DualPaneConfiguration``
+- ``PaneSizing``
+- ``PaneMeasure``
+- ``AccessoryConfiguration``
+- ``AccessoryStyle``
+
 ### Solving
 
-- ``ScreenLayoutSolver``
-- ``ScreenLayoutPreference``
+- ``DualPaneSolver``
+- ``ArrangementPreference``
 - ``LayoutSolution``
-- ``ScreenLayoutMode``
+- ``PaneArrangement``
