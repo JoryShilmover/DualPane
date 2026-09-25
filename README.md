@@ -5,8 +5,7 @@ side-by-side or split arrangement around hinges, camera cutouts and safe areas.
 
 Extracted from the screen-layout solver in the Duo DS emulator.
 
-> **Status:** early (0.x). The solver still carries its original DS-oriented defaults (4:3 panes,
-> optional thumb-control regions). Generalizing them is the next milestone. Expect breaking changes.
+> **Status:** early (0.x). Expect breaking changes before 1.0.
 
 ## Modules
 
@@ -29,13 +28,12 @@ dependencies: [
 ```swift
 import DualPaneCore
 
-let environment = DisplayEnvironment(
-    bounds: CGRect(x: 0, y: 0, width: 900, height: 700),
-    safeBounds: CGRect(x: 0, y: 0, width: 900, height: 700),
-    exclusionRegions: [ExclusionRegion(frame: CGRect(x: 440, y: 0, width: 20, height: 700), kind: .division)]
-)
-let solution = ScreenLayoutSolver.solve(environment: environment)
-// solution.upperScreen, solution.lowerScreen, solution.effectiveMode == .split
+let display = CGRect(x: 0, y: 0, width: 1000, height: 700)
+let hinge = ExclusionRegion(frame: CGRect(x: 490, y: 0, width: 20, height: 700), kind: .division)
+let solution = DualPaneSolver.solve(
+    environment: DisplayEnvironment(bounds: display, safeBounds: display, exclusionRegions: [hinge]))
+// solution.arrangement == .split
+// solution.primaryPane == (0, 0, 490, 700), solution.secondaryPane == (510, 0, 490, 700)
 ```
 
 ```swift
@@ -47,6 +45,21 @@ DualPaneLayout {
     DetailView()
 }
 ```
+
+### Configuration
+
+`DualPaneConfiguration` controls what the solver optimises for:
+
+| Setting | Default | Meaning |
+|---|---|---|
+| `primarySizing`, `secondarySizing` | `.fill` | Fill the slot, or `.aspectRatio(r)` for the largest centred rectangle of that ratio. |
+| `gutter` | 8 | Space between stacked or side-by-side panes. |
+| `measure` | `.shortSide` | How pane size is compared: `.width` or `.shortSide`. |
+| `minimumLegibleSize` | 170 | Below this, the solution is compact. |
+| `accessories` | `nil` | Two regions (such as on-screen controls) kept clear of the panes, placed in a band below or flanking them. |
+
+`DualPaneConfiguration.ds` is the preset used by the Duo DS emulator: two 4:3 screens with DS-style
+thumb-control regions.
 
 Fold regions come from the iOS 27.1 SDK. If you build with an older SDK, `DualPaneUIKit` reports
 the safe area only.
