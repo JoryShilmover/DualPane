@@ -1,13 +1,35 @@
 # DualPane
 
+[![Swift versions](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2FJoryShilmover%2FDualPane%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/JoryShilmover/DualPane)
+[![Platforms](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2FJoryShilmover%2FDualPane%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/JoryShilmover/DualPane)
+[![CI](https://github.com/JoryShilmover/DualPane/actions/workflows/ci.yml/badge.svg?branch=develop)](https://github.com/JoryShilmover/DualPane/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/JoryShilmover/DualPane)](https://github.com/JoryShilmover/DualPane/releases)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+
 Lay out two panes on foldable, dual-screen and ordinary displays. DualPane finds the best stacked,
 side-by-side or split arrangement around hinges, camera cutouts and safe areas.
-
-Extracted from the screen-layout solver in the Duo DS emulator.
 
 <p align="center">
   <img src=".github/media/fold.gif" width="400" alt="Two 4:3 DS screens and thumb controls re-laid out as a horizontal fold moves">
 </p>
+
+## Why DualPane?
+
+- **Foldables without special cases.** Hand the solver the hinge and any camera cutout, and it keeps both
+  panes clear of them, splitting across the fold when each side has room. On iOS 27.1, `DualPaneUIKit`
+  reads the fold regions for you.
+- **One layout for every shape.** The same call handles portrait, landscape, Split View and resizable
+  windows, choosing stacked, side by side or split based on which keeps the smaller pane largest.
+- **Fixed-aspect content.** Panes can keep an aspect ratio, such as 4:3 game screens or 16:9 video, and the
+  solver can reserve room for on-screen controls beside them.
+- **Plain geometry you can test.** `DualPaneCore` takes rectangles and returns rectangles, with no UI
+  framework, so layouts can be unit tested. It runs on Apple platforms and Linux.
+
+If you only need to switch between an `HStack` and a `VStack` by width, SwiftUI's `ViewThatFits` or a size
+class check is simpler. DualPane is for when the display itself has obstacles or the panes have shapes to
+keep.
+
+DualPane was extracted from the screen-layout solver in the Duo DS emulator.
 
 > **Status:** early (0.x). Expect breaking changes before 1.0.
 
@@ -15,7 +37,7 @@ Extracted from the screen-layout solver in the Duo DS emulator.
 
 | Product | Platforms | What it does |
 |---|---|---|
-| `DualPaneCore` | all | Platform-independent solver: `DisplayEnvironment` in, `LayoutSolution` out. |
+| `DualPaneCore` | Apple platforms, Linux | Platform-independent solver: `DisplayEnvironment` in, `LayoutSolution` out. |
 | `DualPaneUIKit` | iOS | Captures a `DisplayEnvironment` from a `UIView`, including iOS 27.1 fold regions and hinge changes. |
 | `DualPaneSwiftUI` | iOS, macOS, tvOS, visionOS | `DualPaneLayout`, a SwiftUI `Layout` that places two views. |
 
@@ -23,7 +45,7 @@ Extracted from the screen-layout solver in the Duo DS emulator.
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/JoryShilmover/DualPane.git", from: "0.1.0"),
+    .package(url: "https://github.com/JoryShilmover/DualPane.git", from: "0.1.1"),
 ]
 ```
 
